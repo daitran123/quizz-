@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin panel</title>
+  </head>
+  <body>
+    <h2>Quản lý câu hỏi</h2>
+    <button onclick="logout()">Đăng xuất</button>
+    <div id="questions"></div>
+
+    <h3>Thêm câu hỏi mới</h3>
+    <form id="addForm">
+      <input name="question" placeholder="Câu hỏi" /><br />
+      <input name="option_a" placeholder="Đáp án A" /><br />
+      <input name="option_b" placeholder="Đáp án B" /><br />
+      <input name="option_c" placeholder="Đáp án C" /><br />
+      <input name="option_d" placeholder="Đáp án D" /><br />
+      <input name="correct_answer" placeholder="Đáp án đúng (A/B/C/D)" /><br />
+      <button type="submit">Thêm</button>
+    </form>
+
+    <script>
+      async function loadQuestions() {
+        const res = await fetch("/api/admin/questions", { credentials: "include" });
+        const data = await res.json();
+        document.getElementById("questions").innerHTML = data
+          .map(
+            (q) =>
+              `<p>${q.id}. ${q.question} 
+        <button onclick="del(${q.id})">Xóa</button></p>`
+          )
+          .join("");
+      }
+
+      document.getElementById("addForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        await fetch("/api/admin/questions", {
+          method: "POST",
+          body: new URLSearchParams(formData),
+          credentials: "include",
+        });
+        e.target.reset();
+        loadQuestions();
+      };
+
+      async function del(id) {
+        await fetch("/api/admin/questions/" + id, { method: "DELETE" });
+        loadQuestions();
+      }
+
+      async function logout() {
+        await fetch("/api/logout", { method: "POST" });
+        location.href = "/login.html";
+      }
+
+      loadQuestions();
+    </script>
+  </body>
+</html>

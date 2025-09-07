@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>Đăng nhập Admin</h2>
+    <form id="loginForm">
+      <input type="text" name="username" placeholder="Username" required /><br />
+      <input type="password" name="password" placeholder="Password" required /><br />
+      <button type="submit">Login</button>
+    </form>
+
+    <script>
+      document.getElementById("loginForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const res = await fetch("/api/login", {
+          method: "POST",
+          body: new URLSearchParams(formData),
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) location.href = "/admin.html";
+        else alert(data.message);
+      };
+    </script>
+  </body>
+</html>

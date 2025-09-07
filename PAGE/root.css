@@ -1,0 +1,268 @@
+:root {
+  --main-color: #9c007a; /* màu tím */
+  --main-font: 1.1rem;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--main-color); /* màu nền tím */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+.container {
+  text-align: center;
+}
+#start-btn {
+  background-color: white; /* màu vàng */
+  color: var(--main-color); /* màu tím */
+  width: 181px;
+  height: 69px;
+  border-radius: 10px;
+  font-size: 25px;
+  font-weight: bold;
+  border: none;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+}
+/* modal */
+.modal-content {
+  width: 540px;
+  height: 240px;
+}
+.modal-header {
+  padding-left: 32px;
+  justify-content: left;
+  padding-bottom: 10px;
+}
+.modal-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.modal-body {
+  text-align: left;
+}
+.modal-footer {
+  justify-content: left;
+  padding-left: 32px;
+}
+.btn_close,
+.btn_continue {
+  border: 2px solid var(--main-color);
+  width: 100px;
+  height: 40px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: var(--main-font);
+}
+.btn_close {
+  background-color: white;
+  color: var(--main-color);
+}
+.btn_close:hover {
+  background-color: var(--main-color);
+  color: white;
+}
+.btn_continue {
+  background-color: var(--main-color);
+  color: white;
+}
+ol {
+  padding-left: 32px;
+  margin: 0;
+}
+li {
+  font-size: var(--main-font);
+}
+/* quizz box */
+#quizBox {
+  width: 550px;
+  height: 510px;
+  display: flex;
+}
+.card {
+  width: 550px;
+  height: 510px;
+  background: #fff;
+  border-radius: 10px;
+  text-align: center;
+}
+/* ====== Header ====== */
+.card-header {
+  background: #fff;
+  border-bottom: 3px solid #9c27b0; /* gạch tím */
+  font-weight: bold;
+  font-size: 18px;
+  height: 75px;
+}
+
+.card-header h5 {
+  margin: 0;
+  font-weight: 600;
+  color: #222;
+}
+
+.card-header .badge {
+  font-size: 14px;
+  background: #e8eaf6;
+  border-radius: 6px;
+}
+/* ====== Thanh progress bar ====== */
+#timeBar {
+  height: 3px;
+  background: purple;
+  width: 100%;
+  transition: width 1s linear;
+}
+
+/* ====== Câu hỏi ====== */
+.card-body {
+  padding: 20px;
+  height: 380px;
+}
+.card-body h5 {
+  font-weight: 700;
+  font-size: 20px;
+  color: #222;
+  height: 120px;
+}
+
+/* ====== Danh sách đáp án ====== */
+.list-group-item {
+  border: 1px solid rgb(174, 216, 254);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  background-color: rgb(240, 248, 255); /* xanh nhạt */
+}
+
+.list-group-item:hover {
+  background: rgb(204, 229, 255); /* xanh đậm hơn khi hover */
+  color: var(--main-color);
+}
+
+.list-group-item.active {
+  background: #ede7f6;
+  color: #4527a0;
+  font-weight: 600;
+}
+
+/* ====== Đáp án đúng ====== */
+.list-group-item.correct {
+  background: #d0f0d0 !important; /* xanh nhạt */
+  border: 1px solid #81c784;
+  font-weight: 600;
+  color: #2e7d32;
+  position: relative;
+}
+
+.list-group-item.correct::after {
+  content: "✔";
+  font-size: 18px;
+  color: #2e7d32;
+  font-weight: bold;
+  position: absolute;
+  right: 15px;
+}
+/* ====== Đáp án sai ====== */
+.list-group-item.incorrect {
+  background: #f8d7da !important; /* đỏ nhạt */
+  border: 1px solid #f5c6cb;
+  font-weight: 600;
+  color: #b71c1c;
+  position: relative;
+}
+
+.list-group-item.incorrect::after {
+  content: "✘";
+  font-size: 18px;
+  color: #b71c1c;
+  font-weight: bold;
+  position: absolute;
+  right: 15px;
+}
+
+/* ====== Thanh timebar chạy từ trái sang phải ====== */
+#timeBar {
+  height: 6px;
+  background: linear-gradient(to right, #9c27b0, #e91e63); /* tím → hồng */
+  width: 0%; /* mặc định 0 */
+  border-radius: 3px;
+  transition: width 0.2s linear;
+}
+
+/* ====== Footer ====== */
+.card-footer {
+  background: #fff;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+}
+
+.card-footer span {
+  font-size: 14px;
+  color: #666;
+}
+
+/* ====== Nút Next ====== */
+.btn-next {
+  background: #9c27b0;
+  border: none;
+  color: #fff;
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.btn-next:hover {
+  background: #7b1fa2;
+}
+#resultBox {
+  width: 550px;
+  height: 370px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  text-align: center;
+}
+#resultBox .card {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  text-align: center;
+}
+.btn_replay {
+  background-color: var(--main-color);
+  color: white;
+  width: 150px;
+  height: 50px;
+  border-radius: 5px;
+  font-size: var(--main-font);
+  font-weight: bold;
+  border: none;
+}
+.btn_quit {
+  background-color: white;
+  color: var(--main-color);
+  width: 120px;
+  height: 50px;
+  border-radius: 5px;
+  font-size: var(--main-font);
+  font-weight: bold;
+  border: 2px solid var(--main-color);
+}
+.btn_quit:hover {
+  background-color: var(--main-color);
+  color: white;
+  border: 2px solid var(--main-color);
+}

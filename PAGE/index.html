@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizz game</title>
+    <link rel="stylesheet" href="/bootstrap.min.css" />
+    <link rel="stylesheet" href="/root.css" />
+    <!-- <style>
+      .correct {
+        background-color: #28a745 !important;
+        color: white;
+      }
+      .incorrect {
+        background-color: #dc3545 !important;
+        color: white;
+      }
+      #timeBar {
+        height: 5px;
+        background: purple;
+        width: 0%;
+        transition: width 0.2s linear;
+      }
+      #resultBox {
+        display: none;
+      }
+    </style> -->
+  </head>
+  <body>
+    <div class="container">
+      <!-- Start button -->
+      <button id="start-btn" data-bs-toggle="modal" data-bs-target="#rulesModal">Start Quizz</button>
+
+      <!-- Modal Rules -->
+      <div class="modal" id="rulesModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Rules for the quiz</h5>
+            </div>
+            <div class="modal-body">
+              <ol>
+                <li>Once you select your answer, it can't be undone.</li>
+                <li>You will have only 15 seconds per each question.</li>
+                <li>You'll get points on the basis of your correct answers.</li>
+              </ol>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn_close" data-bs-dismiss="modal">Exit Quiz</button>
+              <button type="button" class="btn_continue" id="continueBtn">Continue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Box -->
+      <div id="quizBox" class="container mt-4 d-none">
+        <div class="card shadow-lg">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Online quiz portal</h5>
+            <div class="badge bg-light text-dark p-2">Time Left <span id="timeLeft">15</span></div>
+          </div>
+          <div id="timeBar"></div>
+          <div class="card-body">
+            <h5 id="questionText">1. Câu hỏi ở đây?</h5>
+            <div class="list-group mt-3"></div>
+          </div>
+          <div class="card-footer text-muted">
+            <span id="progress">1 of 20 Questions</span>
+            <button id="nextBtn" class="btn btn-primary d-none">Next Question</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Box -->
+      <div id="resultBox" class="container mt-4">
+        <div class="card shadow-lg text-center p-4">
+          <h3>🎉 You've completed the Quiz! and congrats!</h3>
+          <p id="scoreText"></p>
+          <div class="d-flex justify-content-center gap-3">
+            <button id="replayBtn" class="btn_replay">Replay Quiz</button>
+            <button id="quitBtn" class="btn_quit">Quit Quiz</button>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        const startBtn = document.getElementById("start-btn");
+        const continueBtn = document.getElementById("continueBtn");
+        const quizBox = document.getElementById("quizBox");
+        const resultBox = document.getElementById("resultBox");
+        const scoreText = document.getElementById("scoreText");
+        const replayBtn = document.getElementById("replayBtn");
+        const quitBtn = document.getElementById("quitBtn");
+
+        let questions = [];
+        let currentIndex = 0;
+        let timer;
+        let timeLimit = 15;
+        let score = 0;
+
+        // Khi nhấn Continue trong modal
+        continueBtn.addEventListener("click", () => {
+          const modal = bootstrap.Modal.getInstance(document.getElementById("rulesModal"));
+          modal.hide();
+          startBtn.style.display = "none"; // Ẩn nút start
+          quizBox.classList.remove("d-none"); // Hiện quiz
+          loadQuiz();
+        });
+
+        // Load câu hỏi từ API
+        async function loadQuiz() {
+          const res = await fetch("/api/questions");
+          questions = await res.json();
+          currentIndex = 0;
+          score = 0;
+          showQuestion(0);
+        }
+
+        // Hiển thị câu hỏi
+        function showQuestion(index) {
+          const q = questions[index];
+          if (!q) return;
+
+          clearInterval(timer);
+          const startTime = Date.now();
+
+          document.getElementById("questionText").innerText = `${index + 1}. ${q.question}`;
+
+          const optionsHtml = `
+                    <button class="list-group-item list-group-item-action" data-value="A">A. ${q.option_a}</button>
+                    <button class="list-group-item list-group-item-action" data-value="B">B. ${q.option_b}</button>
+                    <button class="list-group-item list-group-item-action" data-value="C">C. ${q.option_c}</button>
+                    <button class="list-group-item list-group-item-action" data-value="D">D. ${q.option_d}</button>
+                  `;
+          document.querySelector(".list-group").innerHTML = optionsHtml;
+
+          document.getElementById("progress").innerText = `${index + 1} of ${questions.length} Questions`;
+          document.getElementById("nextBtn").classList.add("d-none");
+
+          document.querySelectorAll(".list-group-item").forEach((btn) => {
+            btn.addEventListener("click", () => selectAnswer(q, btn));
+          });
+
+          function updateTimer() {
+            const now = Date.now();
+            const elapsedMs = now - startTime; // mili-giây đã trôi qua
+            const remainingMs = Math.max(timeLimit * 1000 - elapsedMs, 0);
+
+            // Cập nhật số giây còn lại (làm tròn xuống)
+            document.getElementById("timeLeft").innerText = Math.floor(remainingMs / 1000);
+
+            // Cập nhật % thanh tiến trình (dùng mili-giây cho mượt)
+            const percent = Math.min((elapsedMs / (timeLimit * 1000)) * 100, 100);
+            document.getElementById("timeBar").style.width = percent + "%";
+
+            if (remainingMs <= 0) {
+              clearInterval(timer);
+              lockAnswers();
+              // ✅ Tự động highlight đáp án đúng
+              document.querySelectorAll(".list-group-item").forEach((b) => {
+                if (b.dataset.value === q.correct_answer) {
+                  b.classList.add("correct");
+                }
+              });
+              document.getElementById("nextBtn").classList.remove("d-none");
+            }
+          }
+
+          updateTimer(); // chạy ngay lần đầu
+          timer = setInterval(updateTimer, 50); // tick mỗi 50ms cho mượt
+        }
+        // Xử lý chọn đáp án
+        function selectAnswer(question, button) {
+          document.querySelectorAll(".list-group-item").forEach((b) => (b.disabled = true));
+          if (button.dataset.value === question.correct_answer) {
+            button.classList.add("correct");
+            score++;
+          } else {
+            button.classList.add("incorrect");
+            document.querySelectorAll(".list-group-item").forEach((b) => {
+              if (b.dataset.value === question.correct_answer) b.classList.add("correct");
+            });
+          }
+          clearInterval(timer);
+          document.getElementById("nextBtn").classList.remove("d-none");
+        }
+
+        function lockAnswers() {
+          document.querySelectorAll(".list-group-item").forEach((b) => (b.disabled = true));
+        }
+
+        document.getElementById("nextBtn").addEventListener("click", () => {
+          currentIndex++;
+          if (currentIndex < questions.length) {
+            showQuestion(currentIndex);
+          } else {
+            showResult();
+          }
+        });
+
+        // Hiện kết quả
+        function showResult() {
+          quizBox.classList.add("d-none");
+          resultBox.style.display = "flex";
+          scoreText.innerText = `You got ${score} out of ${questions.length}`;
+        }
+
+        // Replay quiz
+        replayBtn.addEventListener("click", () => {
+          resultBox.style.display = "none";
+          quizBox.classList.remove("d-none");
+          loadQuiz();
+        });
+
+        // Quit quiz
+        quitBtn.addEventListener("click", () => {
+          window.location.reload();
+        });
+      </script>
+    </div>
+  </body>
+</html>
